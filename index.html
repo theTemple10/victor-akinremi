@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victor Akinremi — Backend Engineer</title>
+<meta name="description" content="Victor Akinremi — backend engineer building API infrastructure: gateways, rate limiters, and observability. Lagos, Nigeria.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#0B1E3D;
+    --ink-soft:#152A4D;
+    --gold:#C9A227;
+    --gold-soft:#E4C766;
+    --paper:#F7F5F0;
+    --paper-dim:#EDE9DE;
+    --graphite:#1A1A1A;
+    --slate:#5B6B7F;
+    --ok:#2F7B5C;
+    --line:rgba(11,30,61,0.12);
+    --display:'Space Grotesk',sans-serif;
+    --body:'IBM Plex Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+    --max:1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--graphite);
+    font-family:var(--body);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold); color:var(--ink);}
+
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:2px;}
+
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(247,245,240,0.86);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 0;
+  }
+  .mark{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--mono); font-size:14px; font-weight:500;
+    text-decoration:none; color:var(--ink);
+  }
+  .mark-badge{
+    width:32px; height:32px; border-radius:6px;
+    background:var(--ink); color:var(--gold-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:500; font-size:13px;
+    border:1px solid var(--gold);
+  }
+  nav.links{display:flex; align-items:center; gap:28px;}
+  nav.links a{
+    font-family:var(--mono); font-size:13px; text-decoration:none;
+    color:var(--slate); letter-spacing:0.02em;
+    transition:color .15s ease;
+  }
+  nav.links a:hover{color:var(--ink);}
+  .btn-resume{
+    font-family:var(--mono); font-size:13px;
+    background:var(--ink); color:var(--paper);
+    padding:9px 16px; border-radius:5px; text-decoration:none;
+    border:1px solid var(--ink);
+    transition:background .15s ease, color .15s ease;
+  }
+  .btn-resume:hover{background:var(--gold); border-color:var(--gold); color:var(--ink);}
+
+  @media (max-width:720px){
+    nav.links{display:none;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{padding:88px 0 64px; border-bottom:1px solid var(--line);}
+  .status{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12.5px; color:var(--ok);
+    background:rgba(47,123,92,0.08);
+    border:1px solid rgba(47,123,92,0.25);
+    padding:6px 12px; border-radius:20px;
+    margin-bottom:28px;
+  }
+  .dot{
+    width:7px; height:7px; border-radius:50%; background:var(--ok);
+    position:relative;
+  }
+  .dot::after{
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    border:1px solid var(--ok); animation:pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{transform:scale(0.6); opacity:0.9;}
+    100%{transform:scale(2.2); opacity:0;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .dot::after{animation:none; display:none;}
+  }
+
+  h1.headline{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(34px, 5.4vw, 58px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 22px;
+    max-width:14ch;
+    color:var(--ink);
+  }
+  h1.headline em{
+    font-style:normal; color:var(--gold);
+  }
+  .sub{
+    font-size:17px; color:var(--slate); max-width:52ch; margin:0 0 30px;
+  }
+  .meta{
+    font-family:var(--mono); font-size:13px; color:var(--slate);
+    display:flex; flex-wrap:wrap; gap:6px 0;
+  }
+  .meta span:not(:last-child)::after{content:'·'; margin:0 10px; color:var(--line);}
+
+  /* ---------- RATE LIMITER SIGNATURE WIDGET ---------- */
+  .limiter{
+    margin-top:48px; max-width:460px;
+    border:1px solid var(--line); border-radius:10px;
+    background:var(--paper-dim); padding:18px 20px;
+  }
+  .limiter-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:var(--mono); font-size:11.5px; color:var(--slate);
+    letter-spacing:0.04em; margin-bottom:14px;
+  }
+  .limiter-head b{color:var(--ink); font-weight:500;}
+  .tokens{display:flex; gap:5px; margin-bottom:12px;}
+  .token{
+    flex:1; height:20px; border-radius:3px;
+    background:var(--gold);
+    opacity:0.18;
+    animation:fill 6s ease-in-out infinite;
+  }
+  @keyframes fill{
+    0%,100%{opacity:0.18;}
+    50%{opacity:1;}
+  }
+  .token:nth-child(1){animation-delay:0s;}
+  .token:nth-child(2){animation-delay:.25s;}
+  .token:nth-child(3){animation-delay:.5s;}
+  .token:nth-child(4){animation-delay:.75s;}
+  .token:nth-child(5){animation-delay:1s;}
+  .token:nth-child(6){animation-delay:1.25s;}
+  .token:nth-child(7){animation-delay:1.5s;}
+  .token:nth-child(8){animation-delay:1.75s;}
+  .token:nth-child(9){animation-delay:2s;}
+  .token:nth-child(10){animation-delay:2.25s;}
+  .token:nth-child(11){animation-delay:2.5s;}
+  .token:nth-child(12){animation-delay:2.75s;}
+  .limiter-foot{
+    display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:12px; color:var(--slate);
+  }
+  .limiter-foot b{color:var(--ink);}
+  @media (prefers-reduced-motion:reduce){
+    .token{animation:none; opacity:0.55;}
+    .token:nth-child(-n+7){opacity:1;}
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:72px 0; border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:0.08em;
+    color:var(--gold); text-transform:uppercase; margin-bottom:14px;
+    font-weight:500;
+  }
+  h2.section-title{
+    font-family:var(--display); font-size:clamp(24px,3vw,32px);
+    color:var(--ink); margin:0 0 40px; font-weight:600;
+  }
+
+  /* ---------- WORK CARDS ---------- */
+  .card{
+    border:1px solid var(--line); border-radius:12px;
+    background:#fff; padding:32px;
+    margin-bottom:22px;
+    opacity:0; transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .card.in-view{opacity:1; transform:translateY(0);}
+  @media (prefers-reduced-motion:reduce){
+    .card{opacity:1; transform:none; transition:none;}
+  }
+  .route{
+    font-family:var(--mono); font-size:12.5px; color:var(--slate);
+    display:block; margin-bottom:12px;
+  }
+  .route .verb{color:var(--ok); font-weight:500;}
+  .card h3{
+    font-family:var(--display); font-size:22px; color:var(--ink);
+    margin:0 0 12px; font-weight:600;
+  }
+  .card p{color:var(--graphite); margin:0 0 20px; max-width:66ch;}
+  .tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+  .tag{
+    font-family:var(--mono); font-size:12px; color:var(--ink);
+    background:var(--paper-dim); border:1px solid var(--line);
+    padding:4px 10px; border-radius:20px;
+  }
+  .stats{
+    display:flex; flex-wrap:wrap; gap:20px;
+    font-family:var(--mono); font-size:12.5px; color:var(--slate);
+    border-top:1px dashed var(--line); padding-top:16px; margin-bottom:16px;
+  }
+  .stats b{color:var(--ink); display:block; font-size:14px; margin-bottom:2px;}
+  .card-links{display:flex; gap:18px;}
+  .card-links a{
+    font-family:var(--mono); font-size:13px; text-decoration:none;
+    color:var(--ink); border-bottom:1px solid var(--gold);
+    padding-bottom:1px;
+  }
+  .card-links a:hover{color:var(--gold);}
+  .card-links .disabled{
+    font-family:var(--mono); font-size:13px; color:var(--slate);
+    border-bottom:1px dashed var(--line);
+  }
+
+  /* ---------- STACK ---------- */
+  .stack-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:28px 40px;
+  }
+  @media (max-width:640px){.stack-grid{grid-template-columns:1fr;}}
+  .stack-group h4{
+    font-family:var(--mono); font-size:12px; color:var(--slate);
+    text-transform:uppercase; letter-spacing:0.06em; margin:0 0 10px;
+    font-weight:500;
+  }
+  .stack-group .tags{margin-bottom:0;}
+
+  /* ---------- NOW ---------- */
+  .now-box{
+    border-left:3px solid var(--gold); padding-left:24px; max-width:64ch;
+  }
+  .now-box p{margin:0; color:var(--graphite); font-size:16px;}
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  footer{padding:72px 0 56px; border-bottom:none;}
+  .contact-grid{
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:40px;
+  }
+  .contact-list{list-style:none; padding:0; margin:0;}
+  .contact-list li{margin-bottom:12px;}
+  .contact-list a{
+    font-family:var(--mono); font-size:15px; text-decoration:none;
+    color:var(--ink); border-bottom:1px solid transparent;
+    transition:border-color .15s ease;
+  }
+  .contact-list a:hover{border-color:var(--gold);}
+  .foot-note{
+    font-family:var(--mono); font-size:12px; color:var(--slate);
+    margin-top:56px; display:flex; justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="mark"><span class="mark-badge">VA</span> Victor Akinremi</a>
+    <nav class="links">
+      <a href="#work">Work</a>
+      <a href="#stack">Stack</a>
+      <a href="#now">Now</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <!-- EDIT: point this at your actual resume PDF once it's in the repo -->
+    <a class="btn-resume" href="resume.pdf" download>Resume ↓</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="status"><span class="dot"></span>Available for remote backend roles</span>
+    <h1 class="headline">Backend engineer building the infrastructure that keeps APIs <em>honest.</em></h1>
+    <p class="sub">Self-taught, Lagos-based. I design gateways, rate limiters, and the reliable plumbing most systems take for granted — then write the tests that prove it works.</p>
+    <div class="meta">
+      <span>Lagos, Nigeria</span>
+      <span>Python / FastAPI</span>
+      <span>PostgreSQL · Redis</span>
+    </div>
+
+    <div class="limiter" aria-hidden="true">
+      <div class="limiter-head">
+        <span><b>APIGuardian</b> — live pattern</span>
+        <span>100 req / 10s window</span>
+      </div>
+      <div class="tokens">
+        <div class="token"></div><div class="token"></div><div class="token"></div>
+        <div class="token"></div><div class="token"></div><div class="token"></div>
+        <div class="token"></div><div class="token"></div><div class="token"></div>
+        <div class="token"></div><div class="token"></div><div class="token"></div>
+      </div>
+      <div class="limiter-foot">
+        <span>sliding-window limiter</span>
+        <span><b>Redis</b>-backed</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="eyebrow">Selected work</div>
+    <h2 class="section-title">Systems, not just scripts</h2>
+
+    <article class="card">
+      <span class="route"><span class="verb">GET</span> /work/apiguardian</span>
+      <h3>APIGuardian</h3>
+      <p>A production-grade API gateway built to survive real traffic, not demo traffic. Sliding-window rate limiting in Redis, Claude-powered abuse detection for patterns simple thresholds miss, and Prometheus metrics so failures are visible before they become outages.</p>
+      <div class="tags">
+        <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Redis</span>
+        <span class="tag">asyncpg</span><span class="tag">SQLAlchemy 2.0</span>
+        <span class="tag">Prometheus</span><span class="tag">Claude API</span>
+      </div>
+      <div class="stats">
+        <div><b>84%</b>test coverage</div>
+        <div><b>Sliding-window</b>rate limiting</div>
+        <div><b>AI-assisted</b>abuse detection</div>
+      </div>
+      <div class="card-links">
+        <!-- EDIT: replace with the real repo URL -->
+        <a href="https://github.com/theTemple10" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <span class="route"><span class="verb">GET</span> /work/loan-tracker</span>
+      <h3>Loan Tracker API</h3>
+      <p>A FastAPI + PostgreSQL service for tracking loan issuance and repayment, deployed and hardened on Render — including chasing down a bcrypt version mismatch and a Railway-specific environment-variable syntax that Render silently rejected.</p>
+      <div class="tags">
+        <span class="tag">Python</span><span class="tag">FastAPI</span>
+        <span class="tag">PostgreSQL</span><span class="tag">Render</span>
+      </div>
+      <div class="stats">
+        <div><b>Live</b>on Render</div>
+        <div><b>Resolved</b>bcrypt + env-var deploy issues</div>
+      </div>
+      <div class="card-links">
+        <a href="https://loan-tracker-api-f3xa.onrender.com" target="_blank" rel="noopener">Live API ↗</a>
+        <!-- EDIT: replace with the real repo URL -->
+        <a href="https://github.com/theTemple10" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <span class="route"><span class="verb">GET</span> /work/schoolos</span>
+      <h3>SchoolOS</h3>
+      <p>An AI-assisted school management platform for Nigerian K-12 private schools — admissions, fees, and daily operations in one system, with Claude handling the parts that used to need a full-time admin. In active development with two collaborators.</p>
+      <div class="tags">
+        <span class="tag">Python</span><span class="tag">FastAPI</span>
+        <span class="tag">React</span><span class="tag">React Native</span><span class="tag">Claude API</span>
+      </div>
+      <div class="stats">
+        <div><b>In progress</b>active build</div>
+        <div><b>Team of 3</b>with two collaborators</div>
+      </div>
+      <div class="card-links">
+        <span class="disabled">No public link yet</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="eyebrow">Stack</div>
+    <h2 class="section-title">What I build with</h2>
+    <div class="stack-grid">
+      <div class="stack-group">
+        <h4>Languages</h4>
+        <div class="tags"><span class="tag">Python</span><span class="tag">TypeScript</span></div>
+      </div>
+      <div class="stack-group">
+        <h4>Frameworks</h4>
+        <div class="tags"><span class="tag">FastAPI</span><span class="tag">Flask</span><span class="tag">Node.js</span></div>
+      </div>
+      <div class="stack-group">
+        <h4>Data &amp; Infra</h4>
+        <div class="tags"><span class="tag">PostgreSQL</span><span class="tag">Redis</span><span class="tag">Prometheus</span></div>
+      </div>
+      <div class="stack-group">
+        <h4>AI &amp; Automation</h4>
+        <div class="tags"><span class="tag">Claude / Anthropic API</span><span class="tag">n8n</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="now">
+  <div class="wrap">
+    <div class="eyebrow">Now</div>
+    <h2 class="section-title">Currently</h2>
+    <div class="now-box">
+      <p>Building SchoolOS with two collaborators. Longer-term, I'm working toward graduate study in brain-computer interfaces and neuroprosthetics — the backend work funds that runway and keeps my systems thinking sharp in the meantime.</p>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="eyebrow">Contact</div>
+    <h2 class="section-title">Open to remote roles &amp; contract work</h2>
+    <div class="contact-grid">
+      <ul class="contact-list">
+        <li><a href="mailto:akinremivictor720@gmail.com">akinremivictor720@gmail.com</a></li>
+        <li><a href="https://github.com/theTemple10" target="_blank" rel="noopener">github.com/theTemple10</a></li>
+        <!-- EDIT: add your real LinkedIn URL -->
+        <li><a href="#" target="_blank" rel="noopener">linkedin.com/in/YOUR-HANDLE</a></li>
+      </ul>
+    </div>
+    <div class="foot-note">
+      <span>© 2026 Victor Akinremi</span>
+      <span>Built by hand — no template.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll-reveal for work cards, respecting reduced-motion preference
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce && 'IntersectionObserver' in window){
+    var cards = document.querySelectorAll('.card');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+      });
+    }, {threshold:0.15});
+    cards.forEach(function(c){ io.observe(c); });
+  } else {
+    document.querySelectorAll('.card').forEach(function(c){ c.classList.add('in-view'); });
+  }
+</script>
+
+</body>
+</html>
